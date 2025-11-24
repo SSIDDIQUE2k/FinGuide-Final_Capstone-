@@ -1,35 +1,265 @@
 {% extends 'financial/base.html' %}
 
-{% block title %}AI Chatbot - FinanceAI{% endblock %}
-
 {% block content %}
-<h1>💬 AI Financial Chatbot</h1>
-<p>Get personalized financial advice from our AI assistant powered by advanced language models.</p>
+<div class="min-h-screen bg-gradient-to-br from-purple-50 to-gray-50 py-4 sm:py-8">
+    <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
+        <!-- Page Header -->
+        <div class="mb-4 sm:mb-8">
+            <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold">
+                <span class="text-purple-600">💬 AI Financial</span> <span class="hidden sm:inline">Chatbot</span><span class="sm:hidden">Chat</span>
+            </h1>
+            <p class="text-sm sm:text-base md:text-lg text-gray-600 mt-2">Get personalized financial advice from our intelligent AI assistant</p>
+        </div>
 
-<div class="chat-container">
-    <div class="chat-messages" id="chatMessages">
-        <div class="message assistant">
-            <div class="message-content">
-                👋 Hello! I'm your AI financial assistant. I can help you with budgeting, investing, savings strategies, and financial planning. What would you like to know today?
+        <!-- Mobile Tab Toggle (visible only on mobile) -->
+        <div class="md:hidden mb-4 flex gap-2 border-b border-gray-200">
+            <button id="chatTabBtn" class="px-4 py-2 border-b-2 border-purple-600 text-purple-600 font-medium">Chat</button>
+            <button id="historyTabBtn" class="px-4 py-2 border-b-2 border-transparent text-gray-600 font-medium">History</button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6">
+            <!-- Chat History Sidebar -->
+            <div id="historySidebar" class="hidden md:block lg:col-span-1">
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col h-96 md:h-[500px] sticky top-24">
+                    <div class="flex items-center justify-between p-4 border-b border-gray-200">
+                        <h2 class="text-base sm:text-lg font-bold text-gray-900">History</h2>
+                        <div class="flex gap-2">
+                            <button 
+                                id="newChat"
+                                class="text-sm text-gray-400 hover:text-purple-600 transition"
+                                title="New chat"
+                            >
+                                ➕
+                            </button>
+                            <button 
+                                id="clearHistory"
+                                class="text-sm text-gray-400 hover:text-red-500 transition"
+                                title="Clear history"
+                            >
+                                🗑️
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="flex-1 overflow-y-auto p-3 space-y-2" id="chatHistory">
+                        <div class="text-xs sm:text-sm text-gray-500 text-center py-8">
+                            No history yet
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile History Panel -->
+            <div id="mobileHistoryPanel" class="hidden md:hidden bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col max-h-64 mb-4">
+                <div class="flex items-center justify-between p-4 border-b border-gray-200">
+                    <h2 class="font-bold text-gray-900">History</h2>
+                    <div class="flex gap-2">
+                        <button 
+                            id="newChat2"
+                            class="text-sm text-gray-400 hover:text-purple-600 transition"
+                            title="New chat"
+                        >
+                            ➕
+                        </button>
+                        <button 
+                            id="clearHistory2"
+                            class="text-sm text-gray-400 hover:text-red-500 transition"
+                            title="Clear history"
+                        >
+                            🗑️
+                        </button>
+                    </div>
+                </div>
+                <div class="flex-1 overflow-y-auto p-3 space-y-2" id="chatHistory2">
+                    <div class="text-sm text-gray-500 text-center py-4">
+                        No history yet
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Chat Area -->
+            <div class="lg:col-span-3">
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col h-96 md:h-[500px]">
+                    <!-- Chat Messages -->
+                    <div class="flex-1 overflow-y-auto bg-gray-50 p-3 sm:p-6 space-y-4" id="chatMessages">
+                        <div class="flex gap-3 items-start">
+                            <div class="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-white text-xs sm:text-sm font-bold flex-shrink-0">
+                                AI
+                            </div>
+                            <div class="bg-white rounded-lg px-3 sm:px-4 py-2 sm:py-3 shadow-sm max-w-xs sm:max-w-sm md:max-w-md">
+                                <p class="text-gray-800 text-xs sm:text-sm">👋 Hello! I'm your AI financial assistant. I can help you with budgeting, investing, savings strategies, and financial planning. What would you like to know today?</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chat Input Area -->
+                    <div class="border-t border-gray-200 p-3 sm:p-4 bg-white">
+                        <div class="flex gap-2 sm:gap-3">
+                            <input 
+                                type="text" 
+                                id="chatInput" 
+                                placeholder="Ask about finances..." 
+                                autocomplete="off"
+                                class="flex-1 px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-600 focus:ring-2 focus:ring-purple-100 text-xs sm:text-sm"
+                            >
+                            <button 
+                                id="sendBtn"
+                                class="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition transform hover:scale-105 active:scale-95 text-xs sm:text-sm whitespace-nowrap"
+                            >
+                                Send
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tips Section -->
+                <div class="mt-4 sm:mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
+                    <div class="bg-white rounded-xl p-4 sm:p-5 shadow-sm border border-gray-100 hover:shadow-md transition">
+                        <h3 class="font-semibold text-gray-900 mb-2 text-sm sm:text-base">💡 Tips</h3>
+                        <p class="text-xs sm:text-sm text-gray-600">Ask specific questions about your financial situation</p>
+                    </div>
+                    <div class="bg-white rounded-xl p-4 sm:p-5 shadow-sm border border-gray-100 hover:shadow-md transition">
+                        <h3 class="font-semibold text-gray-900 mb-2 text-sm sm:text-base">📊 Data</h3>
+                        <p class="text-xs sm:text-sm text-gray-600">I can analyze your budget and investment strategies</p>
+                    </div>
+                    <div class="bg-white rounded-xl p-4 sm:p-5 shadow-sm border border-gray-100 hover:shadow-md transition">
+                        <h3 class="font-semibold text-gray-900 mb-2 text-sm sm:text-base">🔒 Privacy</h3>
+                        <p class="text-xs sm:text-sm text-gray-600">Your conversations are completely private</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    <div class="chat-input-area">
-        <input type="text" id="chatInput" placeholder="Ask me about personal finance, budgeting, investments..." autocomplete="off">
-        <button id="sendBtn">Send</button>
-    </div>
 </div>
 
-<div class="loading" id="loading">AI is thinking...</div>
+<style>
+    .message-user {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.75rem;
+    }
+
+    .message-assistant {
+        display: flex;
+        justify-content: flex-start;
+        gap: 0.75rem;
+    }
+
+    .message-content {
+        padding: 0.75rem 1rem;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        line-height: 1.5;
+        word-wrap: break-word;
+    }
+
+    .message-user .message-content {
+        background: linear-gradient(135deg, #6c3fcf 0%, #8b5cf6 100%);
+        color: white;
+        border-radius: 1rem 1rem 0 1rem;
+        max-width: 85%;
+    }
+
+    .message-assistant .message-content {
+        background: white;
+        color: #1f2937;
+        border-radius: 1rem 1rem 1rem 0;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        max-width: 85%;
+    }
+
+    .message-content strong {
+        color: #6c3fcf;
+        font-weight: 600;
+    }
+
+    .message-content em {
+        font-style: italic;
+    }
+
+    #chatMessages {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .history-item {
+        padding: 0.75rem;
+        background: #f3f4f6;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: 1px solid transparent;
+        font-size: 0.875rem;
+        color: #4b5563;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+    }
+
+    .history-item:hover {
+        background: #e5e7eb;
+        border-color: #6c3fcf;
+    }
+
+    .history-item.active {
+        background: #6c3fcf;
+        color: white;
+    }
+
+    @media (max-width: 640px) {
+        .message-user .message-content,
+        .message-assistant .message-content {
+            font-size: 0.8125rem;
+        }
+    }
+</style>
 
 <script>
+const chatMessages = document.getElementById('chatMessages');
+const chatInput = document.getElementById('chatInput');
+const sendBtn = document.getElementById('sendBtn');
+const loading = document.getElementById('loading');
+const chatHistory = document.getElementById('chatHistory');
+const chatHistory2 = document.getElementById('chatHistory2');
+const clearHistoryBtn = document.getElementById('clearHistory');
+const clearHistoryBtn2 = document.getElementById('clearHistory2');
+const newChatBtn = document.getElementById('newChat');
+const newChatBtn2 = document.getElementById('newChat2');
+const chatTabBtn = document.getElementById('chatTabBtn');
+const historyTabBtn = document.getElementById('historyTabBtn');
+const historySidebar = document.getElementById('historySidebar');
+const mobileHistoryPanel = document.getElementById('mobileHistoryPanel');
+
+let conversationHistory = JSON.parse(localStorage.getItem('chatHistory')) || [];
+let currentChatIndex = -1;
+
+// Mobile tab switching
+chatTabBtn.addEventListener('click', () => {
+    chatTabBtn.classList.add('border-purple-600', 'text-purple-600');
+    chatTabBtn.classList.remove('border-transparent', 'text-gray-600');
+    historyTabBtn.classList.remove('border-purple-600', 'text-purple-600');
+    historyTabBtn.classList.add('border-transparent', 'text-gray-600');
+    mobileHistoryPanel.classList.add('hidden');
+});
+
+historyTabBtn.addEventListener('click', () => {
+    historyTabBtn.classList.add('border-purple-600', 'text-purple-600');
+    historyTabBtn.classList.remove('border-transparent', 'text-gray-600');
+    chatTabBtn.classList.remove('border-purple-600', 'text-purple-600');
+    chatTabBtn.classList.add('border-transparent', 'text-gray-600');
+    mobileHistoryPanel.classList.remove('hidden');
+});
+
 function formatResponse(text) {
     let formatted = text;
     
     // Headers
-    formatted = formatted.replace(/^### (.*?)$/gm, '<strong style="color: #3b82f6; display: block; margin-top: 0.5rem; margin-bottom: 0.25rem;">▸ $1</strong>');
-    formatted = formatted.replace(/^## (.*?)$/gm, '<strong style="color: #3b82f6; display: block; margin-top: 0.75rem; margin-bottom: 0.5rem; font-size: 1.1em;">▪ $1</strong>');
-    formatted = formatted.replace(/^# (.*?)$/gm, '<strong style="color: #3b82f6; display: block; margin-top: 1rem; margin-bottom: 0.75rem; font-size: 1.2em;">■ $1</strong>');
+    formatted = formatted.replace(/^### (.*?)$/gm, '<strong style="color: #6c3fcf; display: block; margin-top: 0.5rem; margin-bottom: 0.25rem;">▸ $1</strong>');
+    formatted = formatted.replace(/^## (.*?)$/gm, '<strong style="color: #6c3fcf; display: block; margin-top: 0.75rem; margin-bottom: 0.5rem; font-size: 1.1em;">▪ $1</strong>');
+    formatted = formatted.replace(/^# (.*?)$/gm, '<strong style="color: #6c3fcf; display: block; margin-top: 1rem; margin-bottom: 0.75rem; font-size: 1.2em;">■ $1</strong>');
     
     // Bold
     formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
@@ -46,14 +276,100 @@ function formatResponse(text) {
     return formatted;
 }
 
-const chatMessages = document.getElementById('chatMessages');
-const chatInput = document.getElementById('chatInput');
-const sendBtn = document.getElementById('sendBtn');
-const loading = document.getElementById('loading');
+function updateHistoryUI() {
+    const historyElements = [chatHistory, chatHistory2];
+    
+    historyElements.forEach(el => {
+        if (conversationHistory.length === 0) {
+            el.innerHTML = '<div class="text-xs sm:text-sm text-gray-500 text-center py-4">No history yet</div>';
+            return;
+        }
 
-function addMessage(text, isUser) {
+        el.innerHTML = conversationHistory.map((chat, index) => {
+            const firstMessage = chat.messages[0]?.userMessage || 'New chat';
+            return `
+                <div class="history-item" onclick="loadChat(${index})" title="${firstMessage}">
+                    ${firstMessage.substring(0, 30)}${firstMessage.length > 30 ? '...' : ''}
+                </div>
+            `;
+        }).join('');
+    });
+}
+
+function loadChat(index) {
+    currentChatIndex = index;
+    const chat = conversationHistory[index];
+    
+    // Clear current messages
+    chatMessages.innerHTML = '';
+    
+    // Reload all messages from the chat
+    if (chat.messages.length === 0) {
+        const initialMessage = document.createElement('div');
+        initialMessage.className = 'flex gap-3 items-start';
+        initialMessage.innerHTML = `
+            <div class="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-white text-xs sm:text-sm font-bold flex-shrink-0">
+                AI
+            </div>
+            <div class="bg-white rounded-lg px-3 sm:px-4 py-2 sm:py-3 shadow-sm max-w-xs sm:max-w-sm md:max-w-md">
+                <p class="text-gray-800 text-xs sm:text-sm">👋 Hello! I'm your AI financial assistant. I can help you with budgeting, investing, savings strategies, and financial planning. What would you like to know today?</p>
+            </div>
+        `;
+        chatMessages.appendChild(initialMessage);
+    } else {
+        chat.messages.forEach(msg => {
+            addMessage(msg.userMessage, true, false);
+            if (msg.aiResponse) {
+                addMessage(msg.aiResponse, false, false);
+            }
+        });
+    }
+    
+    chatInput.focus();
+}
+
+function createNewChat() {
+    const newChat = {
+        messages: [],
+        createdAt: new Date().toLocaleString()
+    };
+    
+    conversationHistory.unshift(newChat);
+    currentChatIndex = 0;
+    
+    if (conversationHistory.length > 20) {
+        conversationHistory.pop();
+    }
+    
+    localStorage.setItem('chatHistory', JSON.stringify(conversationHistory));
+    
+    chatMessages.innerHTML = `
+        <div class="flex gap-3 items-start">
+            <div class="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-white text-xs sm:text-sm font-bold flex-shrink-0">
+                AI
+            </div>
+            <div class="bg-white rounded-lg px-3 sm:px-4 py-2 sm:py-3 shadow-sm max-w-xs sm:max-w-sm md:max-w-md">
+                <p class="text-gray-800 text-xs sm:text-sm">👋 Hello! I'm your AI financial assistant. I can help you with budgeting, investing, savings strategies, and financial planning. What would you like to know today?</p>
+            </div>
+        </div>
+    `;
+    
+    updateHistoryUI();
+    chatInput.value = '';
+    chatInput.focus();
+    chatTabBtn.click();
+}
+
+function addMessage(text, isUser, save = true) {
     const messageDiv = document.createElement('div');
-    messageDiv.className = `message ${isUser ? 'user' : 'assistant'}`;
+    messageDiv.className = isUser ? 'message-user' : 'message-assistant';
+    
+    if (!isUser) {
+        const avatar = document.createElement('div');
+        avatar.className = 'w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-white text-xs sm:text-sm font-bold flex-shrink-0';
+        avatar.textContent = 'AI';
+        messageDiv.appendChild(avatar);
+    }
     
     const contentDiv = document.createElement('div');
     contentDiv.className = 'message-content';
@@ -67,15 +383,64 @@ function addMessage(text, isUser) {
     messageDiv.appendChild(contentDiv);
     chatMessages.appendChild(messageDiv);
     chatMessages.scrollTop = chatMessages.scrollHeight;
+    
+    // Save to history
+    if (save) {
+        if (currentChatIndex === -1 || conversationHistory.length === 0) {
+            createNewChat();
+        }
+        
+        const currentChat = conversationHistory[currentChatIndex];
+        
+        if (isUser) {
+            currentChat.messages.push({ userMessage: text, aiResponse: null });
+        } else if (currentChat.messages.length > 0) {
+            currentChat.messages[currentChat.messages.length - 1].aiResponse = text;
+        }
+        
+        localStorage.setItem('chatHistory', JSON.stringify(conversationHistory));
+        updateHistoryUI();
+    }
 }
 
 async function sendMessage() {
     const message = chatInput.value.trim();
-    if (!message) return;
+    if (!message) {
+        console.log('Empty message, returning');
+        return;
+    }
     
+    console.log('Sending message:', message);
+    
+    // Create new chat if none exists
+    if (conversationHistory.length === 0 || currentChatIndex === -1) {
+        createNewChat();
+    }
+    
+    // Add user message to display
     addMessage(message, true);
+    
+    // Clear input immediately
     chatInput.value = '';
-    loading.classList.add('show');
+    sendBtn.disabled = true;
+    chatInput.disabled = true;
+    
+    // Show typing bubble
+    const typingDiv = document.createElement('div');
+    typingDiv.className = 'message-assistant';
+    typingDiv.id = 'typingIndicator';
+    const avatar = document.createElement('div');
+    avatar.className = 'w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-white text-xs sm:text-sm font-bold flex-shrink-0';
+    avatar.textContent = 'AI';
+    const bubbleDiv = document.createElement('div');
+    bubbleDiv.className = 'typing-bubble';
+    bubbleDiv.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+    typingDiv.appendChild(avatar);
+    typingDiv.appendChild(bubbleDiv);
+    chatMessages.appendChild(typingDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    
+    console.log('Typing indicator shown, fetching response');
     
     try {
         const response = await fetch('{% url "financial:chat_api" %}', {
@@ -87,23 +452,82 @@ async function sendMessage() {
             body: JSON.stringify({ message: message })
         });
         
+        console.log('Response status:', response.status);
         const data = await response.json();
-        loading.classList.remove('show');
+        console.log('Response data:', data);
+        
+        // Remove typing indicator
+        const typingIndicator = document.getElementById('typingIndicator');
+        if (typingIndicator) {
+            typingIndicator.remove();
+        }
+        
+        sendBtn.disabled = false;
+        chatInput.disabled = false;
+        chatInput.focus();
         
         if (data.response) {
+            console.log('Adding AI response:', data.response);
             addMessage(data.response, false);
         } else if (data.error) {
+            console.error('API error:', data.error);
             addMessage(`Error: ${data.error}`, false);
         }
     } catch (error) {
-        loading.classList.remove('show');
+        console.error('Fetch error:', error);
+        
+        // Remove typing indicator
+        const typingIndicator = document.getElementById('typingIndicator');
+        if (typingIndicator) {
+            typingIndicator.remove();
+        }
+        
+        sendBtn.disabled = false;
+        chatInput.disabled = false;
+        chatInput.focus();
         addMessage(`Error: ${error.message}`, false);
     }
 }
 
+newChatBtn.addEventListener('click', createNewChat);
+newChatBtn2.addEventListener('click', createNewChat);
+
+clearHistoryBtn.addEventListener('click', () => {
+    if (confirm('Are you sure you want to clear all chat history?')) {
+        conversationHistory = [];
+        currentChatIndex = -1;
+        localStorage.setItem('chatHistory', JSON.stringify(conversationHistory));
+        updateHistoryUI();
+        chatMessages.innerHTML = `
+            <div class="flex gap-3 items-start">
+                <div class="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-white text-xs sm:text-sm font-bold flex-shrink-0">
+                    AI
+                </div>
+                <div class="bg-white rounded-lg px-3 sm:px-4 py-2 sm:py-3 shadow-sm max-w-xs sm:max-w-sm md:max-w-md">
+                    <p class="text-gray-800 text-xs sm:text-sm">👋 Hello! I'm your AI financial assistant. I can help you with budgeting, investing, savings strategies, and financial planning. What would you like to know today?</p>
+                </div>
+            </div>
+        `;
+    }
+});
+
+clearHistoryBtn2.addEventListener('click', () => {
+    clearHistoryBtn.click();
+});
+
 sendBtn.addEventListener('click', sendMessage);
 chatInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') sendMessage();
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+    }
 });
+
+// Initialize history on page load
+updateHistoryUI();
+if (conversationHistory.length > 0) {
+    currentChatIndex = 0;
+    loadChat(0);
+}
 </script>
 {% endblock %}

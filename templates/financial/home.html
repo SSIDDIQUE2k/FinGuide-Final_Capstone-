@@ -1,63 +1,121 @@
-{% extends 'financial/base.html' %}
-
-{% block title %}Home - FinanceAI Financial Assistant{% endblock %}
+{% extends "financial/base.html" %}
+{% load static %}
 
 {% block content %}
-<div style="text-align: center; margin-bottom: 3rem;">
-    <h1 style="font-size: 2.5rem; margin-bottom: 1rem;">Welcome to FinanceAI</h1>
-    <p style="font-size: 1.1rem; color: #6b7280; max-width: 600px; margin: 0 auto;">
-        Your AI-powered financial assistant. Get personalized advice on budgeting, investments, and financial planning.
-    </p>
-</div>
+<div class="flex flex-col">
+<!-- Hero Section -->
+  <section class="container mx-auto px-3 sm:px-4 py-12 sm:py-20 md:py-32">
+    <div class="max-w-4xl mx-auto text-center space-y-4 sm:space-y-8">
+      <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-bold tracking-tight text-balance leading-tight">
+        Your AI-Powered <span class="text-purple-600">Financial Companion</span>
+      </h1>
+      <p class="text-sm sm:text-base md:text-lg lg:text-xl text-gray-600 leading-relaxed text-balance max-w-2xl mx-auto">
+        Make smarter financial decisions with personalized AI guidance. Track expenses, learn investing,
+        and achieve your financial goals.
+      </p>
 
-<div class="grid-2" style="margin-bottom: 3rem;">
-    <div style="background: linear-gradient(135deg, #dbeafe 0%, #f3e8ff 100%); padding: 2rem; border-radius: 0.75rem; border: 1px solid #e5e7eb;">
-        <div style="font-size: 2rem; margin-bottom: 1rem;">💬</div>
-        <h3 style="margin-top: 0;">AI Chatbot</h3>
-        <p style="color: #6b7280; margin-bottom: 1.5rem;">Get instant financial advice from our AI assistant. Ask questions about budgeting, investing, and more.</p>
-        <a href="{% url 'financial:chatbot' %}" style="display: inline-block; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: white; padding: 0.75rem 1.5rem; border-radius: 0.5rem; text-decoration: none; font-weight: 600; transition: all 0.2s; border: none; cursor: pointer;">Start Chatting</a>
+      <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center">
+        <a href="{% url 'financial:chatbot' %}"
+           class="inline-flex items-center justify-center px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium rounded-lg bg-purple-600 hover:bg-purple-700 text-white transition">
+          Get Started
+          <svg class="ml-2 h-4 w-4" fill="none" stroke="currentColor" stroke-width="2"
+               viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M9 5l7 7-7 7"/>
+          </svg>
+        </a>
+
+        <a href="{% url 'financial:chatbot' %}"
+           class="inline-flex items-center justify-center px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium rounded-lg border border-purple-600 text-purple-600 hover:bg-purple-50 bg-white transition">
+          Try AI Chat
+        </a>
+      </div>
     </div>
+  </section>
 
-    <div style="background: linear-gradient(135deg, #dcfce7 0%, #dbeafe 100%); padding: 2rem; border-radius: 0.75rem; border: 1px solid #e5e7eb;">
-        <div style="font-size: 2rem; margin-bottom: 1rem;">📊</div>
-        <h3 style="margin-top: 0;">Budget Calculator</h3>
-        <p style="color: #6b7280; margin-bottom: 1.5rem;">Use the 50/30/20 budgeting method to allocate your income and take control of your finances.</p>
-        <a href="{% url 'financial:budget' %}" style="display: inline-block; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: white; padding: 0.75rem 1.5rem; border-radius: 0.5rem; text-decoration: none; font-weight: 600; transition: all 0.2s; border: none; cursor: pointer;">Calculate Budget</a>
-    </div>
+  <!-- Features Section -->
+  <section class="bg-gray-50 py-12 sm:py-16 md:py-20">
+    <div class="container mx-auto px-3 sm:px-4">
+      <div class="max-w-6xl mx-auto">
 
-    <div style="background: linear-gradient(135deg, #fef3c7 0%, #dbeafe 100%); padding: 2rem; border-radius: 0.75rem; border: 1px solid #e5e7eb;">
-        <div style="font-size: 2rem; margin-bottom: 1rem;">🧮</div>
-        <h3 style="margin-top: 0;">Financial Calculators</h3>
-        <p style="color: #6b7280; margin-bottom: 1.5rem;">Calculate compound interest, loan payments, and investment growth to plan your financial future.</p>
-        <a href="{% url 'financial:calculator' %}" style="display: inline-block; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: white; padding: 0.75rem 1.5rem; border-radius: 0.5rem; text-decoration: none; font-weight: 600; transition: all 0.2s; border: none; cursor: pointer;">Use Calculators</a>
-    </div>
-
-    <div style="background: linear-gradient(135deg, #fecaca 0%, #fef3c7 100%); padding: 2rem; border-radius: 0.75rem; border: 1px solid #e5e7eb;">
-        <div style="font-size: 2rem; margin-bottom: 1rem;">📚</div>
-        <h3 style="margin-top: 0;">Financial Literacy</h3>
-        <p style="color: #6b7280; margin-bottom: 1.5rem;">Learn about personal finance, investing strategies, and wealth building with our AI-powered guidance.</p>
-        <a href="{% url 'financial:chatbot' %}" style="display: inline-block; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: white; padding: 0.75rem 1.5rem; border-radius: 0.5rem; text-decoration: none; font-weight: 600; transition: all 0.2s; border: none; cursor: pointer;">Learn More</a>
-    </div>
-</div>
-
-<div style="background: linear-gradient(135deg, #f0f9ff 0%, #f3e8ff 100%); padding: 2rem; border-radius: 0.75rem; border: 1px solid #e5e7eb; text-align: center;">
-    <h2 style="margin-top: 0;">Why Choose FinanceAI?</h2>
-    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2rem; margin-top: 1.5rem;">
-        <div>
-            <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🤖</div>
-            <h3 style="margin: 0.5rem 0;">AI-Powered</h3>
-            <p style="font-size: 0.9rem; color: #6b7280;">Advanced machine learning for personalized recommendations</p>
+        <div class="text-center space-y-2 sm:space-y-4 mb-8 sm:mb-12">
+          <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold">Everything You Need for Financial Success</h2>
+          <p class="text-gray-600 text-sm sm:text-base md:text-lg">
+            Powerful tools designed to help you manage and grow your wealth
+          </p>
         </div>
-        <div>
-            <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">⚡</div>
-            <h3 style="margin: 0.5rem 0;">Instant Results</h3>
-            <p style="font-size: 0.9rem; color: #6b7280;">Get calculations and advice in seconds</p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+
+          <!-- Feature Cards -->
+          <div class="border border-gray-200 rounded-xl p-4 sm:p-6 space-y-3 sm:space-y-4 bg-white shadow-sm hover:shadow-md transition">
+            <div class="h-10 sm:h-12 w-10 sm:w-12 rounded-lg bg-purple-100 flex items-center justify-center text-lg sm:text-2xl">
+              🤖
+            </div>
+            <h3 class="text-base sm:text-xl font-semibold">AI Financial Advisor</h3>
+            <p class="text-gray-600 text-xs sm:text-sm leading-relaxed">
+              Get personalized financial advice powered by advanced AI technology
+            </p>
+          </div>
+
+          <div class="border border-gray-200 rounded-xl p-4 sm:p-6 space-y-3 sm:space-y-4 bg-white shadow-sm hover:shadow-md transition">
+            <div class="h-10 sm:h-12 w-10 sm:w-12 rounded-lg bg-purple-100 flex items-center justify-center text-lg sm:text-2xl">
+              📈
+            </div>
+            <h3 class="text-base sm:text-xl font-semibold">Smart Dashboard</h3>
+            <p class="text-gray-600 text-xs sm:text-sm leading-relaxed">
+              Track your finances with intuitive visualizations and insights
+            </p>
+          </div>
+
+          <div class="border border-gray-200 rounded-xl p-4 sm:p-6 space-y-3 sm:space-y-4 bg-white shadow-sm hover:shadow-md transition">
+            <div class="h-10 sm:h-12 w-10 sm:w-12 rounded-lg bg-purple-100 flex items-center justify-center text-lg sm:text-2xl">
+              🛡️
+            </div>
+            <h3 class="text-base sm:text-xl font-semibold">Secure & Private</h3>
+            <p class="text-gray-600 text-xs sm:text-sm leading-relaxed">
+              Your financial data is encrypted and protected with industry-leading security
+            </p>
+          </div>
+
+          <div class="border border-gray-200 rounded-xl p-4 sm:p-6 space-y-3 sm:space-y-4 bg-white shadow-sm hover:shadow-md transition">
+            <div class="h-10 sm:h-12 w-10 sm:w-12 rounded-lg bg-purple-100 flex items-center justify-center text-lg sm:text-2xl">
+              ⚡
+            </div>
+            <h3 class="text-base sm:text-xl font-semibold">Powerful Tools</h3>
+            <p class="text-gray-600 text-xs sm:text-sm leading-relaxed">
+              Access calculators, budgeting tools, and investment trackers
+            </p>
+          </div>
+
         </div>
-        <div>
-            <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🔒</div>
-            <h3 style="margin: 0.5rem 0;">Secure & Private</h3>
-            <p style="font-size: 0.9rem; color: #6b7280;">Your financial data is safe and never shared</p>
-        </div>
+      </div>
     </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="container mx-auto px-3 sm:px-4 py-12 sm:py-16 md:py-20">
+    <div class="max-w-4xl mx-auto">
+      <div class="bg-purple-600 text-white rounded-2xl shadow-lg overflow-hidden">
+        <div class="p-6 sm:p-8 md:p-12 text-center space-y-4 sm:space-y-6">
+          <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold">Ready to Transform Your Finances?</h2>
+          <p class="text-sm sm:text-base md:text-lg text-purple-100 max-w-2xl mx-auto leading-relaxed">
+            Join thousands of users who are already making smarter financial decisions with FinGuide
+          </p>
+
+          <a href="{% url 'financial:budget' %}"
+             class="inline-flex items-center px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-lg font-semibold rounded-lg bg-white text-purple-600 hover:bg-gray-100 transition">
+            Start Your Journey
+            <svg class="ml-2 h-4 w-4" fill="none" stroke="currentColor" stroke-width="2"
+                 viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M9 5l7 7-7 7"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
 </div>
 {% endblock %}

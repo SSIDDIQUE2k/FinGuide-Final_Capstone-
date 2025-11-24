@@ -1,129 +1,140 @@
 {% extends 'financial/base.html' %}
 
-{% block title %}Financial Calculators - FinanceAI{% endblock %}
-
 {% block content %}
-<h1>🧮 Financial Calculators</h1>
-<p>Use our advanced financial calculators to plan your financial future with confidence.</p>
+<div class="min-h-screen bg-gradient-to-br from-purple-50 to-gray-50 py-4 sm:py-8">
+    <div class="max-w-6xl mx-auto px-3 sm:px-4 lg:px-8">
+        <!-- Page Header -->
+        <div class="mb-6 sm:mb-8 lg:mb-12">
+            <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-2 sm:mb-3">
+                <span class="text-purple-600">🧮 Financial</span> <span class="hidden sm:inline">Calculators</span><span class="sm:hidden">Calcs</span>
+            </h1>
+            <p class="text-sm sm:text-base md:text-lg text-gray-600">Use our advanced calculators to plan your financial future with confidence.</p>
+        </div>
 
-<div style="margin-top: 2rem;">
-    <--help Compound Interest Calculator -->
-    <div style="background: linear-gradient(135deg, #f0f9ff 0%, #fef3c7 100%); padding: 2rem; border-radius: 0.75rem; border: 1px solid #e5e7eb; margin-bottom: 2rem;">
-        <h2 style="margin-top: 0;">💹 Compound Interest Calculator</h2>
-        <p style="color: #6b7280;">Calculate how your investment grows with compound interest over time.</p>
-        
-        <div class="grid-2">
-            <div>
-                <div class="input-group">
-                    <label for="principal">Principal Amount ($)</label>
-                    <input type="number" id="principal" placeholder="Initial investment" step="0.01" min="0">
-                </div>
-                <div class="input-group">
-                    <label for="rate">Annual Interest Rate (%)</label>
-                    <input type="number" id="rate" placeholder="e.g., 7.5" step="0.01" min="0">
-                </div>
-                <div class="input-group">
-                    <label for="time">Years</label>
-                    <input type="number" id="time" placeholder="Investment period" step="0.1" min="0">
-                </div>
-                <button onclick="calculateCompoundInterest()" style="width: 100%;">Calculate</button>
+        <!-- Compound Interest Calculator -->
+        <div class="mb-6 sm:mb-8 bg-white rounded-2xl shadow-lg overflow-hidden">
+            <div class="bg-gradient-to-r from-blue-500 to-blue-600 px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+                <h2 class="text-lg sm:text-2xl font-bold text-white">💹 Compound Interest Calculator</h2>
+                <p class="text-blue-100 mt-1 sm:mt-2 text-xs sm:text-sm">Calculate how your investment grows with compound interest over time.</p>
             </div>
-            <div>
-                <div class="result" id="ciResult">
-                    <h3 style="margin-top: 0;">Results</h3>
-                    <div class="result-item">
-                        <span class="result-label">Final Amount</span>
-                        <span class="result-value" id="ciAmount">$0.00</span>
+
+            <div class="p-4 sm:p-6 lg:p-8">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
+                    <div class="space-y-3 sm:space-y-4">
+                        <div>
+                            <label for="principal" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">Principal Amount ($)</label>
+                            <input type="number" id="principal" placeholder="Initial investment" step="0.01" min="0" class="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-sm">
+                        </div>
+                        <div>
+                            <label for="rate" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">Annual Interest Rate (%)</label>
+                            <input type="number" id="rate" placeholder="e.g., 7.5" step="0.01" min="0" class="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-sm">
+                        </div>
+                        <div>
+                            <label for="time" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">Years</label>
+                            <input type="number" id="time" placeholder="Investment period" step="0.1" min="0" class="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-sm">
+                        </div>
+                        <button onclick="calculateCompoundInterest()" class="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white py-2 sm:py-3 rounded-lg font-semibold transition transform hover:scale-105 active:scale-95 text-sm sm:text-base">Calculate</button>
                     </div>
-                    <div class="result-item">
-                        <span class="result-label">Interest Earned</span>
-                        <span class="result-value" id="ciInterest">$0.00</span>
+
+                    <div class="space-y-3 sm:space-y-4">
+                        <div class="p-4 sm:p-6 bg-blue-50 border border-blue-200 rounded-lg">
+                            <p class="text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2">Final Amount</p>
+                            <p class="text-2xl sm:text-3xl font-bold text-blue-600" id="ciAmount">$0.00</p>
+                        </div>
+                        <div class="p-4 sm:p-6 bg-green-50 border border-green-200 rounded-lg">
+                            <p class="text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2">Interest Earned</p>
+                            <p class="text-2xl sm:text-3xl font-bold text-green-600" id="ciInterest">$0.00</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <--help Loan Calculator -->
-    <div style="background: linear-gradient(135deg, #dbeafe 0%, #f3e8ff 100%); padding: 2rem; border-radius: 0.75rem; border: 1px solid #e5e7eb; margin-bottom: 2rem;">
-        <h2 style="margin-top: 0;">💳 Loan Payment Calculator</h2>
-        <p style="color: #6b7280;">Calculate your monthly loan payment and total interest paid.</p>
-        
-        <div class="grid-2">
-            <div>
-                <div class="input-group">
-                    <label for="loanAmount">Loan Amount ($)</label>
-                    <input type="number" id="loanAmount" placeholder="Total loan amount" step="0.01" min="0">
-                </div>
-                <div class="input-group">
-                    <label for="loanRate">Annual Interest Rate (%)</label>
-                    <input type="number" id="loanRate" placeholder="e.g., 4.5" step="0.01" min="0">
-                </div>
-                <div class="input-group">
-                    <label for="loanTerm">Loan Term (Years)</label>
-                    <input type="number" id="loanTerm" placeholder="e.g., 30" step="1" min="1">
-                </div>
-                <button onclick="calculateLoan()" style="width: 100%;">Calculate Payment</button>
+        <!-- Loan Calculator -->
+        <div class="mb-6 sm:mb-8 bg-white rounded-2xl shadow-lg overflow-hidden">
+            <div class="bg-gradient-to-r from-purple-500 to-purple-600 px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+                <h2 class="text-lg sm:text-2xl font-bold text-white">💳 Loan Payment Calculator</h2>
+                <p class="text-purple-100 mt-1 sm:mt-2 text-xs sm:text-sm">Calculate your monthly loan payment and total interest paid.</p>
             </div>
-            <div>
-                <div class="result" id="loanResult">
-                    <h3 style="margin-top: 0;">Results</h3>
-                    <div class="result-item">
-                        <span class="result-label">Monthly Payment</span>
-                        <span class="result-value" id="monthlyPayment">$0.00</span>
+
+            <div class="p-4 sm:p-6 lg:p-8">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
+                    <div class="space-y-3 sm:space-y-4">
+                        <div>
+                            <label for="loanAmount" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">Loan Amount ($)</label>
+                            <input type="number" id="loanAmount" placeholder="Total loan amount" step="0.01" min="0" class="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-600 focus:ring-2 focus:ring-purple-100 text-sm">
+                        </div>
+                        <div>
+                            <label for="loanRate" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">Annual Interest Rate (%)</label>
+                            <input type="number" id="loanRate" placeholder="e.g., 4.5" step="0.01" min="0" class="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-600 focus:ring-2 focus:ring-purple-100 text-sm">
+                        </div>
+                        <div>
+                            <label for="loanTerm" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">Loan Term (Years)</label>
+                            <input type="number" id="loanTerm" placeholder="e.g., 30" step="1" min="1" class="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-600 focus:ring-2 focus:ring-purple-100 text-sm">
+                        </div>
+                        <button onclick="calculateLoan()" class="w-full bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white py-2 sm:py-3 rounded-lg font-semibold transition transform hover:scale-105 active:scale-95 text-sm sm:text-base">Calculate Payment</button>
                     </div>
-                    <div class="result-item">
-                        <span class="result-label">Total Interest</span>
-                        <span class="result-value" id="totalInterest">$0.00</span>
-                    </div>
-                    <div class="result-item">
-                        <span class="result-label">Total Cost</span>
-                        <span class="result-value" id="totalCost">$0.00</span>
+
+                    <div class="space-y-3 sm:space-y-4">
+                        <div class="p-4 sm:p-6 bg-purple-50 border border-purple-200 rounded-lg">
+                            <p class="text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2">Monthly Payment</p>
+                            <p class="text-2xl sm:text-3xl font-bold text-purple-600" id="monthlyPayment">$0.00</p>
+                        </div>
+                        <div class="p-4 sm:p-6 bg-red-50 border border-red-200 rounded-lg">
+                            <p class="text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2">Total Interest</p>
+                            <p class="text-2xl sm:text-3xl font-bold text-red-600" id="totalInterest">$0.00</p>
+                        </div>
+                        <div class="p-4 sm:p-6 bg-gray-50 border border-gray-200 rounded-lg">
+                            <p class="text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2">Total Cost</p>
+                            <p class="text-2xl sm:text-3xl font-bold text-gray-900" id="totalCost">$0.00</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <--help Investment Growth Calculator -->
-    <div style="background: linear-gradient(135deg, #dcfce7 0%, #dbeafe 100%); padding: 2rem; border-radius: 0.75rem; border: 1px solid #e5e7eb;">
-        <h2 style="margin-top: 0;">📈 Investment Growth Calculator</h2>
-        <p style="color: #6b7280;">Project your investment growth with regular contributions.</p>
-        
-        <div class="grid-2">
-            <div>
-                <div class="input-group">
-                    <label for="initialInv">Initial Investment ($)</label>
-                    <input type="number" id="initialInv" placeholder="Starting amount" step="0.01" min="0">
-                </div>
-                <div class="input-group">
-                    <label for="monthlyContrib">Monthly Contribution ($)</label>
-                    <input type="number" id="monthlyContrib" placeholder="Regular savings" step="0.01" min="0">
-                </div>
-                <div class="input-group">
-                    <label for="annualReturn">Expected Annual Return (%)</label>
-                    <input type="number" id="annualReturn" placeholder="e.g., 8" step="0.1" min="0">
-                </div>
-                <div class="input-group">
-                    <label for="investYears">Years</label>
-                    <input type="number" id="investYears" placeholder="Investment period" step="0.1" min="0">
-                </div>
-                <button onclick="calculateInvestment()" style="width: 100%;">Calculate Growth</button>
+        <!-- Investment Growth Calculator -->
+        <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+            <div class="bg-gradient-to-r from-green-500 to-green-600 px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+                <h2 class="text-lg sm:text-2xl font-bold text-white">📈 Investment Growth Calculator</h2>
+                <p class="text-green-100 mt-1 sm:mt-2 text-xs sm:text-sm">Project your investment growth with regular contributions.</p>
             </div>
-            <div>
-                <div class="result" id="investResult">
-                    <h3 style="margin-top: 0;">Results</h3>
-                    <div class="result-item">
-                        <span class="result-label">Total Invested</span>
-                        <span class="result-value" id="totalInvested">$0.00</span>
+
+            <div class="p-4 sm:p-6 lg:p-8">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
+                    <div class="space-y-3 sm:space-y-4">
+                        <div>
+                            <label for="initialInv" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">Initial Investment ($)</label>
+                            <input type="number" id="initialInv" placeholder="Starting amount" step="0.01" min="0" class="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-green-600 focus:ring-2 focus:ring-green-100 text-sm">
+                        </div>
+                        <div>
+                            <label for="monthlyContrib" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">Monthly Contribution ($)</label>
+                            <input type="number" id="monthlyContrib" placeholder="Regular savings" step="0.01" min="0" class="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-green-600 focus:ring-2 focus:ring-green-100 text-sm">
+                        </div>
+                        <div>
+                            <label for="annualReturn" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">Expected Annual Return (%)</label>
+                            <input type="number" id="annualReturn" placeholder="e.g., 8" step="0.1" min="0" class="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-green-600 focus:ring-2 focus:ring-green-100 text-sm">
+                        </div>
+                        <div>
+                            <label for="investYears" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">Years</label>
+                            <input type="number" id="investYears" placeholder="Investment period" step="0.1" min="0" class="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-green-600 focus:ring-2 focus:ring-green-100 text-sm">
+                        </div>
+                        <button onclick="calculateInvestment()" class="w-full bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white py-2 sm:py-3 rounded-lg font-semibold transition transform hover:scale-105 active:scale-95 text-sm sm:text-base">Calculate Growth</button>
                     </div>
-                    <div class="result-item">
-                        <span class="result-label">Total Gain</span>
-                        <span class="result-value" id="totalGain">$0.00</span>
-                    </div>
-                    <div class="result-item">
-                        <span class="result-label">Final Amount</span>
-                        <span class="result-value" id="finalAmount">$0.00</span>
+
+                    <div class="space-y-3 sm:space-y-4">
+                        <div class="p-4 sm:p-6 bg-blue-50 border border-blue-200 rounded-lg">
+                            <p class="text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2">Total Invested</p>
+                            <p class="text-2xl sm:text-3xl font-bold text-blue-600" id="totalInvested">$0.00</p>
+                        </div>
+                        <div class="p-4 sm:p-6 bg-green-50 border border-green-200 rounded-lg">
+                            <p class="text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2">Total Gain</p>
+                            <p class="text-2xl sm:text-3xl font-bold text-green-600" id="totalGain">$0.00</p>
+                        </div>
+                        <div class="p-4 sm:p-6 bg-purple-50 border border-purple-200 rounded-lg">
+                            <p class="text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2">Final Amount</p>
+                            <p class="text-2xl sm:text-3xl font-bold text-purple-600" id="finalAmount">$0.00</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -132,7 +143,7 @@
 </div>
 
 <script>
-async function calculateCompoundInterest() {
+function calculateCompoundInterest() {
     const principal = parseFloat(document.getElementById('principal').value) || 0;
     const rate = parseFloat(document.getElementById('rate').value) || 0;
     const time = parseFloat(document.getElementById('time').value) || 0;
@@ -147,10 +158,9 @@ async function calculateCompoundInterest() {
     
     document.getElementById('ciAmount').textContent = '$' + amount.toFixed(2);
     document.getElementById('ciInterest').textContent = '$' + interest.toFixed(2);
-    document.getElementById('ciResult').classList.add('show');
 }
 
-async function calculateLoan() {
+function calculateLoan() {
     const loanAmount = parseFloat(document.getElementById('loanAmount').value) || 0;
     const loanRate = parseFloat(document.getElementById('loanRate').value) || 0;
     const loanTerm = parseFloat(document.getElementById('loanTerm').value) || 0;
@@ -169,10 +179,9 @@ async function calculateLoan() {
     document.getElementById('monthlyPayment').textContent = '$' + monthlyPayment.toFixed(2);
     document.getElementById('totalInterest').textContent = '$' + totalInt.toFixed(2);
     document.getElementById('totalCost').textContent = '$' + totalPaid.toFixed(2);
-    document.getElementById('loanResult').classList.add('show');
 }
 
-async function calculateInvestment() {
+function calculateInvestment() {
     const initialInv = parseFloat(document.getElementById('initialInv').value) || 0;
     const monthlyContrib = parseFloat(document.getElementById('monthlyContrib').value) || 0;
     const annualReturn = parseFloat(document.getElementById('annualReturn').value) || 0;
@@ -198,7 +207,6 @@ async function calculateInvestment() {
     document.getElementById('totalInvested').textContent = '$' + totalContributed.toFixed(2);
     document.getElementById('totalGain').textContent = '$' + totalGain.toFixed(2);
     document.getElementById('finalAmount').textContent = '$' + balance.toFixed(2);
-    document.getElementById('investResult').classList.add('show');
 }
 </script>
 {% endblock %}
