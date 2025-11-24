@@ -1,0 +1,65 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.pyd
+*.pdb
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Environment files
+.env
+*.env
+
+# Django stuff
+db.sqlite3
+staticfiles/
+media/
+
+# Chroma Vector DB
+chrome_langchain_db/
+*.sqlite3
+
+# Node/npm stuff
+node_modules/
+package-lock.json
+npm-debug.log
+
+# Logs
+*.log
+logs/
+
+# VSCode
+.vscode/
+
+# Docker
+*.pid
+*.seed
+*.tar
+*.tar.gz
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+desktop.ini
+
+# Cache
+cache/
+*.cache
+
+# Pytest
+.pytest_cache/
+
+# Build folders
+dist/
+build/
+
+# Local variables
+*.local

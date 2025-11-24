@@ -3,6 +3,13 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
 import pandas as pd
+import requests
+from django.conf import settings
+import logging
+
+# Common literals / logger
+logger = logging.getLogger(__name__)
+METHOD_NOT_ALLOWED = 'Method not allowed'
 from langchain_ollama import OllamaLLM
 from langchain_core.prompts import ChatPromptTemplate
 from vector_enhanced import get_retriever
@@ -77,6 +84,53 @@ User Question: {question}""")
             return JsonResponse({'error': str(e)}, status=500)
     
     return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+
+def ollama_chat(prompt):
+    """Call Ollama's /api/generate endpoint and return the text response."""
+    payload = {
+        "model": settings.OLLAMA_MODEL,
+        "prompt": prompt
+    }
+    base = (settings.OLLAMA_API_BASE or "").rstrip('/')
+    url = f"{base}/api/generate"
+    # Basic retry: 2 attempts
+    last_exc = None
+    for attempt in range(2):
+        try:
+            resp = requests.post(url, json=payload, timeout=10)
+            resp.raise_for_status()
+            return resp.json().get("response", "")
+        except Exception as e:
+            last_exc = e
+            logger.warning("Ollama request attempt %d failed: %s", attempt + 1, str(e))
+    return f"[Ollama error] {str(last_exc)}"
+
+
+def chatbot_api(request):
+    """POST endpoint that proxies a user message to Ollama.
+
+    Expects JSON body: {"message": "..."}
+    Returns structured JSON: {"ok": true, "response": "..."} or {"ok": false, "error": "..."}
+    """
+    if request.method != 'POST':
+        return JsonResponse({'ok': False, 'error': METHOD_NOT_ALLOWED}, status=405)
+
+    try:
+        data = json.loads(request.body)
+    except Exception:
+        return JsonResponse({'ok': False, 'error': 'Invalid JSON'}, status=400)
+
+    user_msg = (data.get('message') or '').strip()
+    if not user_msg:
+        return JsonResponse({'ok': False, 'error': 'Empty message'}, status=400)
+
+    reply = ollama_chat(user_msg)
+    if isinstance(reply, str) and reply.startswith('[Ollama error]'):
+        logger.error('Ollama returned an error for message=%s: %s', user_msg[:80], reply)
+        return JsonResponse({'ok': False, 'error': reply}, status=502)
+
+    return JsonResponse({'ok': True, 'response': reply})
 
 
 def budget(request):
