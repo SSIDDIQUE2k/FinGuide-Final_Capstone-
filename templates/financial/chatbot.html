@@ -1,0 +1,206 @@
+{% extends "financial/base.html" %}
+
+{% block title %}AI Financial Chatbot - Financial Tools{% endblock %}
+
+{% block content %}
+<h1>💬 AI Financial Chatbot</h1>
+<p style="color: #666; margin-bottom: 20px;">Ask any financial question and get intelligent, personalized advice from our AI assistant.</p>
+
+<div class="chat-container">
+    <div class="chat-messages" id="chatMessages">
+        <div class="message assistant">
+            <div class="message-content">
+                👋 Hello! I'm your financial advisor AI. Ask me anything about budgeting, investing, debt management, savings, or any other financial topic. How can I help you today?
+            </div>
+        </div>
+    </div>
+    <div class="chat-input-area">
+        <input type="text" id="userInput" placeholder="Ask a financial question..." />
+        <button onclick="sendMessage()">Send</button>
+    </div>
+</div>
+
+<div class="loading" id="loading">
+    <div style="font-size: 20px; margin-bottom: 10px;">⏳</div>
+    Thinking...
+</div>
+
+<div id="errorDiv" class="error" style="display: none;"></div>
+
+<style>
+    .message-content {
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        line-height: 1.6;
+    }
+    
+    .message-content h1, .message-content h2, .message-content h3 {
+        margin-top: 15px;
+        margin-bottom: 10px;
+        font-weight: bold;
+    }
+    
+    .message-content h1 {
+        font-size: 1.3em;
+    }
+    
+    .message-content h2 {
+        font-size: 1.15em;
+    }
+    
+    .message-content h3 {
+        font-size: 1em;
+    }
+    
+    .message-content ul, .message-content ol {
+        margin: 10px 0 10px 20px;
+    }
+    
+    .message-content li {
+        margin: 5px 0;
+    }
+    
+    .message-content code {
+        background: rgba(0,0,0,0.1);
+        padding: 2px 4px;
+        border-radius: 3px;
+        font-family: monospace;
+    }
+    
+    .message-content strong {
+        font-weight: bold;
+    }
+    
+    .message-content em {
+        font-style: italic;
+    }
+</style>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function formatResponse(text) {
+        // Escape HTML first
+        let formatted = escapeHtml(text);
+        
+        // Convert markdown-style formatting
+        // Bold: **text** -> <strong>text</strong>
+        formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        
+        // Italic: *text* -> <em>text</em>
+        formatted = formatted.replace(/\*(.*?)\*/g, '<em>$1</em>');
+        
+        // Headers: # -> convert based on count
+        formatted = formatted.replace(/^### (.*?)$/gm, '<h3>$1</h3>');
+        formatted = formatted.replace(/^## (.*?)$/gm, '<h2>$1</h2>');
+        formatted = formatted.replace(/^# (.*?)$/gm, '<h1>$1</h1>');
+        
+        // Convert line breaks to <br> for display, but preserve structure
+        // This is already handled by white-space: pre-wrap in CSS
+        
+        // Convert numbered lists: 1. item -> <li>item</li>
+        formatted = formatted.replace(/^\d+\.\s+(.*?)$/gm, '<li>$1</li>');
+        
+        // Wrap consecutive <li> in <ol>
+        formatted = formatted.replace(/(<li>.*?<\/li>)/s, '<ol>$1</ol>');
+        
+        // Convert bullet lists: * item or + item -> <li>item</li>
+        formatted = formatted.replace(/^\s*[\*\+]\s+(.*?)$/gm, '<li>$1</li>');
+        
+        // Clean up multiple ol/ol tags
+        formatted = formatted.replace(/<\/ol>\n<ol>/g, '');
+        
+        // Wrap consecutive unordered <li> in <ul>
+        const liPattern = /<li>([^<]*(?:(?!<li>|<ol>|<\/ol>).)*)<\/li>/g;
+        let tempFormatted = formatted;
+        formatted = formatted.replace(/(?<!<ol>)(?<!<\/ol>)\n*(<li>[\s\S]*?<\/li>)\n*(?!<ol>|<ol>)/g, '<ul>$1</ul>');
+        
+        return formatted;
+    }
+
+    function sendMessage() {
+        const userInput = document.getElementById('userInput').value.trim();
+        const chatMessages = document.getElementById('chatMessages');
+        const loading = document.getElementById('loading');
+        const errorDiv = document.getElementById('errorDiv');
+
+        if (!userInput) return;
+
+        // Display user message
+        const userMessageDiv = document.createElement('div');
+        userMessageDiv.className = 'message user';
+        userMessageDiv.innerHTML = '<div class="message-content">' + escapeHtml(userInput) + '</div>';
+        chatMessages.appendChild(userMessageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        // Clear input
+        document.getElementById('userInput').value = '';
+
+        // Show loading
+        loading.classList.add('show');
+        errorDiv.style.display = 'none';
+
+        // Send request to server
+        fetch('/api/chat/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            body: JSON.stringify({ message: userInput })
+        })
+        .then(response => response.json())
+        .then(data => {
+            loading.classList.remove('show');
+            
+            if (data.error) {
+                errorDiv.textContent = 'Error: ' + data.error;
+                errorDiv.style.display = 'block';
+            } else {
+                const assistantMessageDiv = document.createElement('div');
+                assistantMessageDiv.className = 'message assistant';
+                assistantMessageDiv.innerHTML = '<div class="message-content">' + formatResponse(data.response) + '</div>';
+                chatMessages.appendChild(assistantMessageDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+        })
+        .catch(error => {
+            loading.classList.remove('show');
+            errorDiv.textContent = 'Error: ' + error.message;
+            errorDiv.style.display = 'block';
+        });
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function escapeHtml(text) {
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return text.replace(/[&<>"']/g, m => map[m]);
+    }
+
+    // Allow Enter key to send message
+    document.getElementById('userInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') sendMessage();
+    });
+</script>
+{% endblock %}

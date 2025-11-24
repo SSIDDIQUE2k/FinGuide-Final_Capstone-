@@ -1,0 +1,56 @@
+{% extends "financial/base.html" %}
+
+{% block title %}Home - Financial Tools{% endblock %}
+
+{% block content %}
+<h1>Welcome to Financial Tools 🎯</h1>
+
+<p style="font-size: 18px; color: #555; margin-bottom: 30px; line-height: 1.6;">
+    Your all-in-one platform for financial education and planning. We provide intelligent tools to help you make smarter financial decisions.
+</p>
+
+<div class="grid-2">
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 10px; text-align: center;">
+        <div style="font-size: 40px; margin-bottom: 15px;">💬</div>
+        <h3 style="color: white; margin-bottom: 10px;">AI Financial Chatbot</h3>
+        <p style="margin-bottom: 20px;">Ask any financial question and get intelligent, personalized advice powered by AI.</p>
+        <a href="{% url 'financial:chatbot' %}" style="display: inline-block; background: white; color: #667eea; padding: 10px 25px; border-radius: 6px; text-decoration: none; font-weight: 600;">Get Started →</a>
+    </div>
+
+    <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 30px; border-radius: 10px; text-align: center;">
+        <div style="font-size: 40px; margin-bottom: 15px;">📊</div>
+        <h3 style="color: white; margin-bottom: 10px;">Budget Calculator</h3>
+        <p style="margin-bottom: 20px;">Create and manage your budget using the popular 50/30/20 allocation method.</p>
+        <a href="{% url 'financial:budget' %}" style="display: inline-block; background: white; color: #f5576c; padding: 10px 25px; border-radius: 6px; text-decoration: none; font-weight: 600;">Get Started →</a>
+    </div>
+
+    <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 30px; border-radius: 10px; text-align: center;">
+        <div style="font-size: 40px; margin-bottom: 15px;">🧮</div>
+        <h3 style="color: white; margin-bottom: 10px;">Financial Calculator</h3>
+        <p style="margin-bottom: 20px;">Calculate compound interest, loans, and investment growth with precision.</p>
+        <a href="{% url 'financial:calculator' %}" style="display: inline-block; background: white; color: #00f2fe; padding: 10px 25px; border-radius: 6px; text-decoration: none; font-weight: 600;">Get Started →</a>
+    </div>
+
+    <div style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; padding: 30px; border-radius: 10px; text-align: center;">
+        <div style="font-size: 40px; margin-bottom: 15px;">📈</div>
+        <h3 style="color: white; margin-bottom: 10px;">Learn & Grow</h3>
+        <p style="margin-bottom: 20px;">Enhance your financial literacy with our AI-powered guidance and insights.</p>
+        <a href="{% url 'financial:chatbot' %}" style="display: inline-block; background: white; color: #38f9d7; padding: 10px 25px; border-radius: 6px; text-decoration: none; font-weight: 600;">Get Started →</a>
+    </div>
+</div>
+
+<div style="background: #f0f4ff; border-left: 4px solid #667eea; padding: 25px; border-radius: 6px; margin-top: 40px;">
+    <h3 style="color: #667eea; margin-bottom: 15px;">How to Get Started 🚀</h3>
+    <ol style="color: #555; line-height: 2;">
+        <li><strong>Ask Questions:</strong> Visit the AI Chatbot to get instant financial advice</li>
+        <li><strong>Plan Your Budget:</strong> Use the Budget Calculator to organize your finances</li>
+        <li><strong>Run Calculations:</strong> Use the Financial Calculator for loans, investments, and interest</li>
+        <li><strong>Take Action:</strong> Implement the advice and track your progress</li>
+    </ol>
+</div>
+
+<div style="background: #efe; border-left: 4px solid #3c3; padding: 25px; border-radius: 6px; margin-top: 20px;">
+    <h3 style="color: #3c3; margin-bottom: 10px;">💡 Tip</h3>
+    <p style="color: #555;">Start by asking our AI chatbot anything about personal finance, budgeting, investing, or debt management. Our AI is trained on comprehensive financial knowledge!</p>
+</div>
+{% endblock %}

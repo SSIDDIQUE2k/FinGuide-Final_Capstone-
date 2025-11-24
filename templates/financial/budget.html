@@ -1,0 +1,197 @@
+{% extends "financial/base.html" %}
+
+{% block title %}Budget Calculator - Financial Tools{% endblock %}
+
+{% block content %}
+<h1>📊 Budget Calculator</h1>
+<p style="color: #666; margin-bottom: 20px;">Plan your budget using the popular 50/30/20 allocation method or customize it to your needs.</p>
+
+<div class="grid-2">
+    <div>
+        <h2>Budget Input</h2>
+        
+        <div class="input-group">
+            <label for="income">Monthly Income ($)</label>
+            <input type="number" id="income" placeholder="Enter your monthly income" min="0" step="0.01" />
+        </div>
+
+        <div style="background: #f0f4ff; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+            <h3 style="color: #667eea; margin-bottom: 15px; font-size: 16px;">📋 50/30/20 Method</h3>
+            <p style="color: #555; font-size: 13px; margin-bottom: 10px;">
+                <strong>50%</strong> - Needs (housing, food, utilities)<br>
+                <strong>30%</strong> - Wants (entertainment, dining)<br>
+                <strong>20%</strong> - Savings & Debt Repayment
+            </p>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                <input type="checkbox" id="customToggle" onchange="toggleCustom()" />
+                <span>Customize percentages</span>
+            </label>
+        </div>
+
+        <div id="customInputs" style="display: none; background: #f9f9f9; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+            <div class="input-group">
+                <label for="needsPercent">Needs (%)</label>
+                <input type="number" id="needsPercent" value="50" min="0" max="100" step="0.1" />
+            </div>
+            <div class="input-group">
+                <label for="wantsPercent">Wants (%)</label>
+                <input type="number" id="wantsPercent" value="30" min="0" max="100" step="0.1" />
+            </div>
+            <div class="input-group">
+                <label for="savingsPercent">Savings (%)</label>
+                <input type="number" id="savingsPercent" value="20" min="0" max="100" step="0.1" />
+            </div>
+            <p style="color: #999; font-size: 12px;">Total: <span id="percentageTotal">100</span>%</p>
+        </div>
+
+        <button onclick="calculateBudget()">Calculate Budget</button>
+        <div id="budgetError" class="error" style="display: none;"></div>
+    </div>
+
+    <div>
+        <h2>Budget Breakdown</h2>
+        <div class="result" id="budgetResult">
+            <h3>Your Monthly Budget 💰</h3>
+            
+            <div class="result-item">
+                <span class="result-label">Total Income</span>
+                <span class="result-value">$<span id="resultIncome">0.00</span></span>
+            </div>
+
+            <div class="result-item" style="background: #fff3cd; padding: 10px; border-radius: 4px; margin: 10px 0;">
+                <span class="result-label">📌 Needs (50%)</span>
+                <span class="result-value" style="color: #ff8c00;">$<span id="resultNeeds">0.00</span></span>
+            </div>
+
+            <div class="result-item">
+                <span style="font-size: 12px; color: #666;">Housing, Food, Utilities</span>
+                <span style="font-size: 12px; color: #666;"><span id="needsPercent2">0</span>%</span>
+            </div>
+
+            <div class="result-item" style="background: #fff0f5; padding: 10px; border-radius: 4px; margin: 10px 0;">
+                <span class="result-label">🎉 Wants (30%)</span>
+                <span class="result-value" style="color: #d946a6;">$<span id="resultWants">0.00</span></span>
+            </div>
+
+            <div class="result-item">
+                <span style="font-size: 12px; color: #666;">Entertainment, Dining, Hobbies</span>
+                <span style="font-size: 12px; color: #666;"><span id="wantsPercent2">0</span>%</span>
+            </div>
+
+            <div class="result-item" style="background: #e8f5e9; padding: 10px; border-radius: 4px; margin: 10px 0;">
+                <span class="result-label">🏦 Savings (20%)</span>
+                <span class="result-value" style="color: #22c55e;">$<span id="resultSavings">0.00</span></span>
+            </div>
+
+            <div class="result-item">
+                <span style="font-size: 12px; color: #666;">Emergency Fund, Debt Repayment, Investments</span>
+                <span style="font-size: 12px; color: #666;"><span id="savingsPercent2">0</span>%</span>
+            </div>
+        </div>
+
+        <div style="background: #f0f4ff; border-left: 4px solid #667eea; padding: 15px; border-radius: 6px; margin-top: 20px;">
+            <h3 style="color: #667eea; margin-bottom: 10px; font-size: 16px;">💡 Tips</h3>
+            <ul style="color: #555; font-size: 13px; line-height: 1.8;">
+                <li>Start with the 50/30/20 method and adjust based on your needs</li>
+                <li>Track your spending regularly to stay on budget</li>
+                <li>Prioritize building an emergency fund (3-6 months of expenses)</li>
+                <li>Review and adjust your budget quarterly</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function toggleCustom() {
+        const customInputs = document.getElementById('customInputs');
+        customInputs.style.display = document.getElementById('customToggle').checked ? 'block' : 'none';
+    }
+
+    document.getElementById('needsPercent').addEventListener('input', updatePercentageTotal);
+    document.getElementById('wantsPercent').addEventListener('input', updatePercentageTotal);
+    document.getElementById('savingsPercent').addEventListener('input', updatePercentageTotal);
+
+    function updatePercentageTotal() {
+        const total = parseFloat(document.getElementById('needsPercent').value || 0) +
+                      parseFloat(document.getElementById('wantsPercent').value || 0) +
+                      parseFloat(document.getElementById('savingsPercent').value || 0);
+        document.getElementById('percentageTotal').textContent = total.toFixed(1);
+    }
+
+    function calculateBudget() {
+        const income = parseFloat(document.getElementById('income').value);
+        const errorDiv = document.getElementById('budgetError');
+
+        if (!income || income <= 0) {
+            errorDiv.textContent = 'Please enter a valid income amount';
+            errorDiv.style.display = 'block';
+            return;
+        }
+
+        const data = { income: income };
+
+        if (document.getElementById('customToggle').checked) {
+            data.needs_percent = parseFloat(document.getElementById('needsPercent').value || 50);
+            data.wants_percent = parseFloat(document.getElementById('wantsPercent').value || 30);
+            data.savings_percent = parseFloat(document.getElementById('savingsPercent').value || 20);
+        }
+
+        fetch('/api/calculate-budget/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                errorDiv.textContent = 'Error: ' + data.error;
+                errorDiv.style.display = 'block';
+            } else {
+                errorDiv.style.display = 'none';
+                
+                document.getElementById('resultIncome').textContent = data.income.toFixed(2);
+                document.getElementById('resultNeeds').textContent = data.needs.toFixed(2);
+                document.getElementById('resultWants').textContent = data.wants.toFixed(2);
+                document.getElementById('resultSavings').textContent = data.savings.toFixed(2);
+                
+                document.getElementById('needsPercent2').textContent = data.breakdown.needs_percent;
+                document.getElementById('wantsPercent2').textContent = data.breakdown.wants_percent;
+                document.getElementById('savingsPercent2').textContent = data.breakdown.savings_percent;
+                
+                document.getElementById('budgetResult').classList.add('show');
+            }
+        })
+        .catch(error => {
+            errorDiv.textContent = 'Error: ' + error.message;
+            errorDiv.style.display = 'block';
+        });
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    document.getElementById('income').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') calculateBudget();
+    });
+</script>
+{% endblock %}
