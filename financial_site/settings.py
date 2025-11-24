@@ -11,6 +11,11 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env (if present)
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,12 +25,22 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-51%2%pe*&ngl48oead9v&3&vwp6skmh&-v1w@0jsdt$(zg&dv='
+# Prefer environment-provided secret; fall back to the existing dev key.
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-51%2%pe*&ngl48oead9v&3&vwp6skmh&-v1w@0jsdt$(zg&dv=')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Treat common truthy values as True
+DEBUG = os.getenv('DEBUG', 'True').lower() in ('1', 'true', 'yes')
 
-ALLOWED_HOSTS = []
+# Parse ALLOWED_HOSTS from env; fall back to localhost during development
+ALLOWED_HOSTS = [h.strip() for h in os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',') if h.strip()]
+
+# Ollama settings
+OLLAMA_API_BASE = os.getenv('OLLAMA_API_BASE', 'http://localhost:11434')
+OLLAMA_MODEL = os.getenv('OLLAMA_MODEL', 'llama3.1')
+
+# Vector DB
+VECTOR_DB_PATH = os.getenv('VECTOR_DB_PATH', 'chrome_langchain_db')
 
 
 # Application definition

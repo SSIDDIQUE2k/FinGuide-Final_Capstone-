@@ -443,6 +443,7 @@ async function sendMessage() {
     console.log('Typing indicator shown, fetching response');
     
     try {
+        // Use the LangChain endpoint with vector DB context
         const response = await fetch('{% url "financial:chat_api" %}', {
             method: 'POST',
             headers: {
@@ -451,8 +452,6 @@ async function sendMessage() {
             },
             body: JSON.stringify({ message: message })
         });
-        
-        console.log('Response status:', response.status);
         const data = await response.json();
         console.log('Response data:', data);
         
