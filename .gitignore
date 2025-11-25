@@ -63,3 +63,4 @@ build/
 
 # Local variables
 *.local
+chrome_langchain_db/
