@@ -1,8 +1,6 @@
 {% extends 'financial/base.html' %}
-{% load static %}
 
 {% block content %}
-{% csrf_token %}
 <div class="min-h-screen bg-gradient-to-br from-purple-50 to-gray-50 py-4 sm:py-8">
     <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
         <!-- Page Header -->
@@ -220,22 +218,6 @@
 </style>
 
 <script>
-// CSRF token helper
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
-
 const chatMessages = document.getElementById('chatMessages');
 const chatInput = document.getElementById('chatInput');
 const sendBtn = document.getElementById('sendBtn');
@@ -466,7 +448,7 @@ async function sendMessage() {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken')
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''
             },
             body: JSON.stringify({ message: message })
         });

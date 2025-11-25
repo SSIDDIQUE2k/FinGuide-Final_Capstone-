@@ -121,7 +121,7 @@ def ollama_chat(prompt):
         url = f"{base}{ep}"
         try:
             logger.debug('Trying Ollama endpoint: %s', url)
-            resp = requests.post(url, json=payload, timeout=10)
+            resp = requests.post(url, json=payload, timeout=10, proxies={'http': None, 'https': None})
             # If we get a successful response, return its text
             if resp.status_code >= 200 and resp.status_code < 300:
                 try:
