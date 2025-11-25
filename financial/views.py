@@ -15,15 +15,19 @@ logger = logging.getLogger(__name__)
 
 # Initialize LLM and retriever (used by the LangChain chat_api)
 try:
-    model = OllamaLLM(model=settings.OLLAMA_MODEL or "tinyllama")
-except Exception:
+    model = OllamaLLM(model=settings.OLLAMA_MODEL or "llama3.2:latest", base_url=settings.OLLAMA_API_BASE)
+    logger.info('LLM initialized successfully with model: %s', settings.OLLAMA_MODEL)
+except Exception as e:
     model = None
+    logger.warning('LLM initialization failed: %s', str(e))
 
 retriever = None
 try:
     retriever = get_retriever()
-except Exception:
+    logger.info('Vector retriever initialized successfully')
+except Exception as e:
     retriever = None
+    logger.warning('Vector retriever initialization failed: %s', str(e))
 
 # System prompt for financial assistant
 SYSTEM_PROMPT = """You are a warm, friendly, and knowledgeable financial advisor AI. 
@@ -85,18 +89,49 @@ User Question: {question}""")
         ])
 
         if model is None:
-            return JsonResponse({'error': 'LLM not available'}, status=500)
+            # Provide helpful fallback when Ollama is not available
+            fallback_msg = (
+                "I apologize, but the AI service is currently unavailable. "
+                "This typically means Ollama is not running on the server.\n\n"
+                "However, I can still provide some guidance based on your question about: " + user_message + "\n\n"
+            )
+            
+            if context:
+                # Use retrieved context to provide a helpful response
+                fallback_msg += "Here's some relevant information from our financial database:\n\n" + context[:500]
+            else:
+                fallback_msg += "Please contact the administrator to enable the AI chatbot service."
+            
+            return JsonResponse({'response': fallback_msg})
 
-        chain = prompt | model
-        response = chain.invoke({
-            'context': context,
-            'question': user_message
-        })
-
-        return JsonResponse({'response': response})
+        try:
+            chain = prompt | model
+            response = chain.invoke({
+                'context': context,
+                'question': user_message
+            })
+            return JsonResponse({'response': response})
+        except Exception as llm_error:
+            logger.error('LLM invocation error: %s', str(llm_error))
+            # Provide context-based fallback if LLM fails
+            if context:
+                fallback_msg = (
+                    "The AI service encountered an error, but here's relevant information from our database:\n\n" +
+                    context[:800] + "\n\n" +
+                    "For more detailed assistance, please ensure the Ollama service is running."
+                )
+                return JsonResponse({'response': fallback_msg})
+            raise
+            
     except Exception as e:
         logger.exception('chat_api error')
-        return JsonResponse({'error': str(e)}, status=500)
+        error_msg = str(e)
+        if 'Connection refused' in error_msg or 'bad gateway' in error_msg.lower():
+            return JsonResponse({
+                'error': 'AI service is unavailable. Please ensure Ollama is running on the server.',
+                'details': 'Connection to Ollama failed'
+            }, status=503)
+        return JsonResponse({'error': f'Server error: {error_msg}'}, status=500)
 
 
 def ollama_chat(prompt):
@@ -121,7 +156,8 @@ def ollama_chat(prompt):
         url = f"{base}{ep}"
         try:
             logger.debug('Trying Ollama endpoint: %s', url)
-            resp = requests.post(url, json=payload, timeout=10, proxies={'http': None, 'https': None})
+            # Disable proxies for direct connection (fixes local proxy issues)
+            resp = requests.post(url, json=payload, timeout=15, proxies={'http': None, 'https': None})
             # If we get a successful response, return its text
             if resp.status_code >= 200 and resp.status_code < 300:
                 try:
@@ -133,6 +169,12 @@ def ollama_chat(prompt):
             # Record non-2xx for logging and continue to next candidate
             logger.warning('Ollama endpoint %s returned %s: %s', url, resp.status_code, resp.text[:400])
             last_exc = requests.exceptions.HTTPError(f"{resp.status_code} for {url}")
+        except requests.exceptions.ConnectionError as e:
+            last_exc = e
+            logger.warning('Connection failed for %s: %s (Ollama may not be running)', url, str(e))
+        except requests.exceptions.Timeout as e:
+            last_exc = e
+            logger.warning('Timeout contacting %s: %s', url, str(e))
         except Exception as e:
             last_exc = e
             logger.warning('Failed contacting %s: %s', url, str(e))
@@ -140,7 +182,11 @@ def ollama_chat(prompt):
 
     # If we're here, all attempts failed
     logger.error('All Ollama endpoint attempts failed; last error: %s', str(last_exc))
-    return f'Ollama error: {str(last_exc)}'
+    
+    # Provide more helpful error message
+    if isinstance(last_exc, requests.exceptions.ConnectionError):
+        return 'Unable to connect to Ollama service. Please ensure Ollama is installed and running on the server.'
+    return f'Ollama service unavailable: {str(last_exc)}'
 
 
 def chatbot_api(request):

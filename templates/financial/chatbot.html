@@ -452,8 +452,8 @@ async function sendMessage() {
             },
             body: JSON.stringify({ message: message })
         });
-        const data = await response.json();
-        console.log('Response data:', data);
+        
+        console.log('Response status:', response.status);
         
         // Remove typing indicator
         const typingIndicator = document.getElementById('typingIndicator');
@@ -465,12 +465,28 @@ async function sendMessage() {
         chatInput.disabled = false;
         chatInput.focus();
         
+        if (!response.ok) {
+            let errorMsg = 'Server error occurred';
+            try {
+                const errorData = await response.json();
+                errorMsg = errorData.error || errorData.details || errorMsg;
+            } catch (e) {
+                errorMsg = `Server returned ${response.status}: ${response.statusText}`;
+            }
+            console.error('API error:', errorMsg);
+            addMessage(`⚠️ ${errorMsg}`, false);
+            return;
+        }
+        
+        const data = await response.json();
+        console.log('Response data:', data);
+        
         if (data.response) {
             console.log('Adding AI response:', data.response);
             addMessage(data.response, false);
         } else if (data.error) {
             console.error('API error:', data.error);
-            addMessage(`Error: ${data.error}`, false);
+            addMessage(`⚠️ ${data.error}`, false);
         }
     } catch (error) {
         console.error('Fetch error:', error);
@@ -484,7 +500,13 @@ async function sendMessage() {
         sendBtn.disabled = false;
         chatInput.disabled = false;
         chatInput.focus();
-        addMessage(`Error: ${error.message}`, false);
+        
+        // Better error message for network issues
+        let errorMsg = error.message;
+        if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+            errorMsg = 'Unable to connect to the server. Please check your connection.';
+        }
+        addMessage(`⚠️ Error: ${errorMsg}`, false);
     }
 }
 
