@@ -34,13 +34,13 @@ DEBUG = os.getenv('DEBUG', 'True').lower() in ('1', 'true', 'yes')
 
 # Parse ALLOWED_HOSTS from env; fall back to localhost during development
 ALLOWED_HOSTS = [
-    '54.218.71.146',
+    '35.89.27.111',  # Updated for t3.small instance
     'localhost',
     '127.0.0.1'
 ]
 CSRF_TRUSTED_ORIGINS = [
-    'http://54.218.71.146',
-    'http://54.218.71.146:80',
+    'http://35.89.27.111',
+    'http://35.89.27.111:80',
 ]
 
 # Ollama settings
