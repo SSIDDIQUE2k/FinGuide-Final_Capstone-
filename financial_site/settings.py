@@ -33,7 +33,15 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-51%2%pe*&ngl48oead9
 DEBUG = os.getenv('DEBUG', 'True').lower() in ('1', 'true', 'yes')
 
 # Parse ALLOWED_HOSTS from env; fall back to localhost during development
-ALLOWED_HOSTS = [h.strip() for h in os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',') if h.strip()]
+ALLOWED_HOSTS = [
+    '54.218.71.146',
+    'localhost',
+    '127.0.0.1'
+]
+CSRF_TRUSTED_ORIGINS = [
+    'http://54.218.71.146',
+    'http://54.218.71.146:80',
+]
 
 # Ollama settings
 OLLAMA_API_BASE = os.getenv('OLLAMA_API_BASE', 'http://localhost:11434')
