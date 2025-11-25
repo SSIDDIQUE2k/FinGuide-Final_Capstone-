@@ -199,11 +199,11 @@ Provide a helpful, concise response (max 250 words):"""
     
     try:
         logger.info('Calling Ollama with reduced memory settings')
-        # Short timeout to prevent worker hanging
+        # Timeout needs to account for model load time + generation
         resp = requests.post(
             url, 
             json=payload, 
-            timeout=45,  # 45 second timeout
+            timeout=90,  # 90 second timeout for t3.micro with tinyllama
             proxies={'http': None, 'https': None}
         )
         
@@ -217,7 +217,7 @@ Provide a helpful, concise response (max 250 words):"""
             return f'ERROR: Ollama returned status {resp.status_code}'
             
     except requests.exceptions.Timeout:
-        logger.error('Ollama request timed out after 45s')
+        logger.error('Ollama request timed out after 90s')
         return 'ERROR: Request timed out - server may be overloaded'
     except requests.exceptions.ConnectionError as e:
         logger.error('Cannot connect to Ollama: %s', str(e))
