@@ -31,7 +31,7 @@ except Exception as e:
 
 logger = logging.getLogger(__name__)
 
-# Initialize LLM and retriever (used by the LangChain chat_api)
+# Initialize LLM (used by the LangChain chat_api)
 try:
     # Ensure we're using localhost without any proxy
     import os
@@ -49,14 +49,6 @@ try:
 except Exception as e:
     model = None
     logger.warning('LLM initialization failed: %s', str(e))
-
-retriever = None
-try:
-    retriever = get_retriever()
-    logger.info('Vector retriever initialized successfully')
-except Exception as e:
-    retriever = None
-    logger.warning('Vector retriever initialization failed: %s', str(e))
 
 # System prompt for financial assistant
 SYSTEM_PROMPT = """You are a warm, friendly, and knowledgeable financial advisor AI. 
