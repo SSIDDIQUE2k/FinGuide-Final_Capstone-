@@ -15,7 +15,16 @@ logger = logging.getLogger(__name__)
 
 # Initialize LLM and retriever (used by the LangChain chat_api)
 try:
-    model = OllamaLLM(model=settings.OLLAMA_MODEL or "llama3.2:latest", base_url=settings.OLLAMA_API_BASE)
+    # Ensure we're using localhost without any proxy
+    import os
+    os.environ['NO_PROXY'] = 'localhost,127.0.0.1'
+    os.environ['no_proxy'] = 'localhost,127.0.0.1'
+    
+    model = OllamaLLM(
+        model=settings.OLLAMA_MODEL or "llama3.2:latest", 
+        base_url=settings.OLLAMA_API_BASE,
+        timeout=30
+    )
     logger.info('LLM initialized successfully with model: %s', settings.OLLAMA_MODEL)
 except Exception as e:
     model = None
