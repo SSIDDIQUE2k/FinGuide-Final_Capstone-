@@ -3,7 +3,9 @@ from langchain_chroma import Chroma
 from langchain_core.documents import Document
 import os
 import pandas as pd
+from dotenv import load_dotenv
 
+EMBED_MODEL = os.getenv("EMBED_MODEL", "nomic-embed-text")
 # Load financial data
 try:
     df = pd.read_csv("Financial-Literacy-Compilation.csv")
@@ -12,7 +14,7 @@ except FileNotFoundError:
     print("❌ Error: Financial-Literacy-Compilation.csv not found!")
     raise
 
-embeddings = OllamaEmbeddings(model="mxbai-embed-large")
+embeddings = OllamaEmbeddings(model=EMBED_MODEL)
 
 db_location = "./chrome_langchain_db"
 add_documents = not os.path.exists(db_location)

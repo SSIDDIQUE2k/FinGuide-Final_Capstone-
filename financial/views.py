@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 # Initialize LLM and retriever (used by the LangChain chat_api)
 try:
-    model = OllamaLLM(model=settings.OLLAMA_MODEL or "llama3.2")
+    model = OllamaLLM(model=settings.OLLAMA_MODEL or "tinyllama")
 except Exception:
     model = None
 

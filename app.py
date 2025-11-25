@@ -4,6 +4,11 @@
 Simple, clean, and ready to use!
 """
 
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+
 print("""
 ╔════════════════════════════════════════════════════════════════════╗
 ║                                                                    ║
@@ -39,7 +44,8 @@ except ImportError as e:
     exit(1)
 
 # Initialize LLM
-model = OllamaLLM(model="llama3.2")
+model_name = os.getenv("OLLAMA_MODEL", "tinyllama")
+model = OllamaLLM(model=model_name)
 
 # System prompt for ChatGPT-like responses
 SYSTEM_PROMPT = """You are an exceptional financial advisor and educator, with the communication style of ChatGPT.
