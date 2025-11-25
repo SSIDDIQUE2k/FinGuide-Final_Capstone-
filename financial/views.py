@@ -115,6 +115,22 @@ User Question: {question}""")
             
             return JsonResponse({'response': fallback_msg})
 
+        # Check if we should skip Ollama due to resource constraints
+        USE_OLLAMA = os.environ.get('USE_OLLAMA', 'true').lower() == 'true'
+        
+        if not USE_OLLAMA:
+            # Fallback mode - use only vector database context
+            if context:
+                fallback_msg = (
+                    "📚 **Financial Information:**\n\n" +
+                    context[:800] + "\n\n" +
+                    "💡 This response is based on our financial knowledge database. " +
+                    "For more personalized advice, please consult a financial advisor."
+                )
+                return JsonResponse({'response': fallback_msg})
+            else:
+                return JsonResponse({'response': 'I can help with financial questions. Try asking about budgeting, investing, or saving!'})
+
         try:
             # Use direct Ollama API call with streaming to reduce memory
             ollama_response = ollama_chat_direct(user_message, context)
