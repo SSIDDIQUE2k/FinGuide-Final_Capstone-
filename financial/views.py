@@ -9,7 +9,25 @@ import subprocess
 from django.conf import settings
 from langchain_ollama import OllamaLLM
 from langchain_core.prompts import ChatPromptTemplate
-from vector_enhanced import get_retriever
+
+# Import simple fallback for when Ollama is unavailable
+try:
+    from simple_fallback import simple_search
+    SIMPLE_FALLBACK_AVAILABLE = True
+except ImportError:
+    SIMPLE_FALLBACK_AVAILABLE = False
+    simple_search = None
+
+# Try to import vector retriever (requires Ollama embeddings)
+try:
+    from vector_enhanced import get_retriever
+    retriever = get_retriever()
+    logger_temp = logging.getLogger(__name__)
+    logger_temp.info('Vector retriever initialized successfully')
+except Exception as e:
+    retriever = None
+    logger_temp = logging.getLogger(__name__)
+    logger_temp.warning('Vector retriever initialization failed: %s', str(e))
 
 logger = logging.getLogger(__name__)
 
@@ -88,6 +106,13 @@ def chat_api(request):
                 context = "\n".join([doc.page_content for doc in docs])
             except Exception:
                 context = ""
+        elif SIMPLE_FALLBACK_AVAILABLE:
+            # Use simple keyword search as fallback
+            try:
+                context = simple_search(user_message, top_k=2)
+            except Exception as e:
+                logger.warning('Simple fallback search failed: %s', str(e))
+                context = ""
 
         # Create prompt template
         prompt = ChatPromptTemplate.from_messages([
@@ -119,17 +144,21 @@ User Question: {question}""")
         USE_OLLAMA = os.environ.get('USE_OLLAMA', 'true').lower() == 'true'
         
         if not USE_OLLAMA:
-            # Fallback mode - use only vector database context
+            # Fallback mode - use only database context
             if context:
-                fallback_msg = (
-                    "📚 **Financial Information:**\n\n" +
-                    context[:800] + "\n\n" +
-                    "💡 This response is based on our financial knowledge database. " +
-                    "For more personalized advice, please consult a financial advisor."
-                )
-                return JsonResponse({'response': fallback_msg})
+                # Context already formatted by simple_search if using fallback
+                if SIMPLE_FALLBACK_AVAILABLE and not retriever:
+                    return JsonResponse({'response': context})
+                else:
+                    fallback_msg = (
+                        "📚 **Financial Information:**\n\n" +
+                        context[:800] + "\n\n" +
+                        "💡 This response is based on our financial knowledge database. " +
+                        "For more personalized advice, please consult a financial advisor."
+                    )
+                    return JsonResponse({'response': fallback_msg})
             else:
-                return JsonResponse({'response': 'I can help with financial questions. Try asking about budgeting, investing, or saving!'})
+                return JsonResponse({'response': 'I can help with financial questions. Try asking about budgeting, investing, savings, or debt management!'})
 
         try:
             # Use direct Ollama API call with streaming to reduce memory
