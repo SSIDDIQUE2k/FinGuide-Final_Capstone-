@@ -20,10 +20,12 @@ try:
     os.environ['NO_PROXY'] = 'localhost,127.0.0.1'
     os.environ['no_proxy'] = 'localhost,127.0.0.1'
     
+    # Use shorter timeout for memory-constrained environments
     model = OllamaLLM(
         model=settings.OLLAMA_MODEL or "llama3.2:latest", 
         base_url=settings.OLLAMA_API_BASE,
-        timeout=30
+        timeout=60,  # Reduced from 30 to give more time but not too long
+        num_predict=256  # Limit response length to reduce memory usage
     )
     logger.info('LLM initialized successfully with model: %s', settings.OLLAMA_MODEL)
 except Exception as e:
@@ -114,20 +116,33 @@ User Question: {question}""")
             return JsonResponse({'response': fallback_msg})
 
         try:
-            chain = prompt | model
-            response = chain.invoke({
-                'context': context,
-                'question': user_message
-            })
-            return JsonResponse({'response': response})
+            # Use direct Ollama API call with streaming to reduce memory
+            ollama_response = ollama_chat_direct(user_message, context)
+            if ollama_response.startswith('ERROR:'):
+                # If Ollama fails, use context-based fallback
+                if context:
+                    fallback_msg = (
+                        "⚠️ The AI service is temporarily unavailable due to server resources.\n\n" +
+                        "📚 Here's relevant information from our financial knowledge base:\n\n" +
+                        context[:600] + "\n\n" +
+                        "💡 **Tip:** For complex questions, try breaking them into smaller parts."
+                    )
+                    return JsonResponse({'response': fallback_msg})
+                else:
+                    return JsonResponse({
+                        'error': 'AI service temporarily unavailable',
+                        'details': ollama_response
+                    }, status=503)
+            
+            return JsonResponse({'response': ollama_response})
         except Exception as llm_error:
             logger.error('LLM invocation error: %s', str(llm_error))
             # Provide context-based fallback if LLM fails
             if context:
                 fallback_msg = (
-                    "The AI service encountered an error, but here's relevant information from our database:\n\n" +
+                    "⚠️ The AI encountered an error, but here's relevant information from our database:\n\n" +
                     context[:800] + "\n\n" +
-                    "For more detailed assistance, please ensure the Ollama service is running."
+                    "Please try rephrasing your question or contact support if the issue persists."
                 )
                 return JsonResponse({'response': fallback_msg})
             raise
@@ -143,9 +158,83 @@ User Question: {question}""")
         return JsonResponse({'error': f'Server error: {error_msg}'}, status=500)
 
 
+def ollama_chat_direct(user_message, context=""):
+    """
+    Memory-efficient direct call to Ollama API with context injection.
+    Returns formatted response or ERROR: prefix on failure.
+    """
+    base = (settings.OLLAMA_API_BASE or '').rstrip('/')
+    if not base:
+        return 'ERROR: OLLAMA_API_BASE not configured'
+    
+    # Construct prompt with context
+    if context:
+        full_prompt = f"""{SYSTEM_PROMPT}
+
+Financial Context:
+{context[:1000]}
+
+User Question: {user_message}
+
+Provide a helpful, concise response (max 250 words):"""
+    else:
+        full_prompt = f"""{SYSTEM_PROMPT}
+
+User Question: {user_message}
+
+Provide a helpful, concise response (max 250 words):"""
+    
+    payload = {
+        'model': settings.OLLAMA_MODEL,
+        'prompt': full_prompt,
+        'stream': False,
+        'options': {
+            'num_predict': 300,  # Limit tokens to reduce memory
+            'temperature': 0.7,
+            'top_p': 0.9
+        }
+    }
+    
+    url = f"{base}/api/generate"
+    
+    try:
+        logger.info('Calling Ollama with reduced memory settings')
+        # Short timeout to prevent worker hanging
+        resp = requests.post(
+            url, 
+            json=payload, 
+            timeout=45,  # 45 second timeout
+            proxies={'http': None, 'https': None}
+        )
+        
+        if resp.status_code == 200:
+            try:
+                return resp.json().get('response', 'No response from model')
+            except Exception:
+                return resp.text
+        else:
+            logger.error('Ollama returned %s: %s', resp.status_code, resp.text[:200])
+            return f'ERROR: Ollama returned status {resp.status_code}'
+            
+    except requests.exceptions.Timeout:
+        logger.error('Ollama request timed out after 45s')
+        return 'ERROR: Request timed out - server may be overloaded'
+    except requests.exceptions.ConnectionError as e:
+        logger.error('Cannot connect to Ollama: %s', str(e))
+        return 'ERROR: Cannot connect to Ollama service'
+    except Exception as e:
+        logger.exception('Ollama request failed')
+        return f'ERROR: {str(e)}'
+
+
 def ollama_chat(prompt):
     """Call Ollama's /api/generate endpoint and return the text response."""
-    payload = {'model': settings.OLLAMA_MODEL, 'prompt': prompt}
+    payload = {
+        'model': settings.OLLAMA_MODEL, 
+        'prompt': prompt,
+        'stream': False,
+        'options': {'num_predict': 256}  # Limit response length
+    }
 
     # Common endpoint candidates used by different Ollama versions / API layers
     endpoints = [
@@ -166,7 +255,8 @@ def ollama_chat(prompt):
         try:
             logger.debug('Trying Ollama endpoint: %s', url)
             # Disable proxies for direct connection (fixes local proxy issues)
-            resp = requests.post(url, json=payload, timeout=15, proxies={'http': None, 'https': None})
+            # Use shorter timeout for memory-constrained environments
+            resp = requests.post(url, json=payload, timeout=30, proxies={'http': None, 'https': None})
             # If we get a successful response, return its text
             if resp.status_code >= 200 and resp.status_code < 300:
                 try:
